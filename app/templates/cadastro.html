@@ -1,0 +1,19 @@
+<html>
+  <h1>Tela de cadastro</h1>
+  <fieldset>
+    <legend>Cadastro</legend>
+    <form action = "http://localhost:5000/checar_cadastro" method = post>
+      {% for field in form %}
+        <tr>
+          <th>{{ field.label }}</th>
+          <td>{{ field }}</td>
+          <br>
+        </tr>
+      {% endfor %}
+      {% if error %}
+        <p>Usuário já existente</p>
+      {% endif%}
+      {{form.submit}}
+    </form>
+  </fieldset>
+</html>

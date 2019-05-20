@@ -1,0 +1,18 @@
+<html>
+  <fieldset>
+    <legend>Login</legend>
+    <form action = "http://localhost:5000/check_login" method = post>
+      {% for field in form %}
+        <tr>
+          <th>{{ field.label }}</th>
+          <td>{{ field }}</td>
+          <br>
+        </tr>
+      {% endfor %}
+      {% if error %}
+        <p>Usuário ou senha incorreta</p>
+      {% endif%}
+      {{form.submit}}
+    </form>
+  </fieldset>
+</html>
