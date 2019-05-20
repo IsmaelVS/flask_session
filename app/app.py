@@ -5,15 +5,16 @@ import datetime
 from functools import wraps
 
 import jwt
-from flask import (Flask, jsonify, make_response, render_template, request,
-                   url_for)
+from flask import Flask, jsonify, make_response, render_template, request
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import check_password_hash, generate_password_hash
 from wtforms import Form, PasswordField, StringField, SubmitField
 
 app = Flask(__name__)
 
-app.config['SECRET_KEY'] = 'thisissecret'
+app.config['SECRET_KEY'] = 'teste'
+
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db.sqlite'
 
 db = SQLAlchemy(app)
 
@@ -36,7 +37,8 @@ class Usuario(db.Model):
 
     def __repr__(self):
         return """
-        Usuario(username={}, password={}, admin={})""".format(self.username, self.password, self.admin)
+        Usuario(username={}, password={}, admin={})""".format(
+            self.username, self.password, self.admin)
 
 
 class Login(Form):
@@ -98,16 +100,14 @@ def check_login():
     if not user:
         return make_response('Could not verify', 401, {
             'WWW-Authenticate': 'Basic realm="Login required!"'})
-    # import ipdb; ipdb.sset_trace()
     if check_password_hash(user.password, auth.password):
-        import ipdb; ipdb.sset_trace()
         token = jwt.encode({
          'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=10)},
          app.config['SECRET_KEY'])
 
-        # return jsonify({'token': token.decode('UTF-8')})
-        request.headers['token'] = token
-        return url_for('logado')
+        # request.headers['token'] = token
+        return jsonify({'token': token.decode('UTF-8')})
+        # return url_for('logado')
 
     return make_response('Could not verify', 401, {
         'WWW-Authenticate': 'Basic realm="Login required!"'})
@@ -129,7 +129,8 @@ def home():
 def checar_cadastro():
     """Rota para checar cadastro."""
     username = request.form['login']
-    hashed_password = generate_password_hash(request.form['password'], method='sha256')
+    hashed_password = generate_password_hash(
+        request.form['password'], method='sha256')
     user = Usuario(
         username=username,
         password=hashed_password,
